@@ -1,0 +1,14 @@
+<!-- eCommerce\templates\eCommerce\login.html -->
+{% extends "base.html" %}
+{% block content %}
+  <h1 class="mb-4 text-center">Journalist Management Dashboard:</h1>
+    <div class="text-center">
+      <a href="{% url 'journalist_article_management_page' %}" class="btn btn-primary btn-lg me-3 mb-3" style="padding: 20px 40px; font-size: 1.5rem;">
+          Articles
+      </a>
+      <!-- <a href="{% url 'journalist_start_page' %}" class="btn btn-danger btn-lg me-3 mb-3" style="padding: 20px 40px; font-size: 1.5rem;">
+          Newsletters
+      </a> -->
+    </div>
+  
+{% endblock %}

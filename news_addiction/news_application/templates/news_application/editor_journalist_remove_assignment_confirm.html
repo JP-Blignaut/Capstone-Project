@@ -1,0 +1,36 @@
+<!-- templates\news_application\editor_journalist_remove_assignment_confirm.html -->
+{% extends 'base.html' %}
+
+{% block title %}Unassign Journalist From Publisher - {{ journalist.name }}{% endblock %}
+
+{% block content %}
+<h2>Confirm Unassignment</h2>
+
+<p><strong>Warning:</strong> This action cannot be undone.</p>
+
+<p>Are you sure you want to unassign the following journalist from the publisher?</p>
+
+<div style="border: 1px solid #ddd; padding: 15px; margin: 20px 0; background-color: #000000;">
+    <h3>{{ journalist.name }}</h3>
+    {% if journalist.biography %}
+        <p>{{ journalist.biography|truncatewords:20 }}</p>
+    {% endif %}
+    {% if journalist.email %}
+        <p><strong>Email:</strong> {{ journalist.email }}</p>
+    {% endif %}
+    {% if journalist.phone_number %}
+        <p><strong>Contact:</strong> {{ journalist.phone_number }}</p>
+    {% endif %}
+</div>
+
+<form method="post" style="display: inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">
+        Yes, Unassign Journalist
+    </button>
+</form>
+
+<a href="{% url 'editor_journalist_management_page' publisher.pk %}" class="btn btn-secondary">
+    Cancel
+</a>
+{% endblock %}

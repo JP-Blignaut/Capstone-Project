@@ -1,0 +1,58 @@
+<!-- news_application\templates\news_application\journalist_article_form.html -->
+{% extends 'base.html' %}
+{% block title %}
+    Article Management -
+    {% if form.instance.pk %}
+        Edit
+    {% else %}
+        Create
+    {% endif %}
+    Article
+{% endblock %}
+{% block content %}
+<h2>
+    {% if form.instance.pk %}
+        Edit
+    {% else %}
+        Create
+    {% endif %}
+    Article
+</h2>
+{# Show non-field errors at the top so user sees form-level problems #}
+{% if form.non_field_errors %}
+  <div class="text-danger mb-3">
+    {{ form.non_field_errors }}
+  </div>
+{% endif %}
+<form method="post" enctype="multipart/form-data" 
+     action="{% url 'editor_article_edit_page' pk=form.instance.pk %}">
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="mb-3">
+            {{ field.label_tag }}
+            {{ field }}
+            {# Per-field errors shown immediately under the field #}
+            {% if field.errors %}
+              <div class="text-danger">
+                {{ field.errors }}
+              </div>
+            {% endif %}
+            {% if field.help_text %}
+            <div class="form-text">{{ field.help_text }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% if form.non_field_errors %}
+      <div class="text-danger">
+          {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+    <button type="submit" class = "btn btn-primary me-3">
+        Save
+    </button>
+</form>
+<div class="mt-2"></div>
+  <a href="{% url 'editor_article_management_page' article.publisher.pk %}" class = "btn btn-secondary me-3">
+    Back to Article Management
+  </a>
+{% endblock %}

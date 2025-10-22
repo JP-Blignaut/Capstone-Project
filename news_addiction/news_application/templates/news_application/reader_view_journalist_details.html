@@ -1,0 +1,45 @@
+<!-- eCommerce\templates\eCommerce\vendor_product_detail.html -->
+{% extends "base.html" %}
+{% block content %}
+  <h1 class="mb-3">Journalist Profile: {{ journalist.display_name }}</h1>
+<div class="product p-4 mb-4 rounded shadow border border-3 border-primary">
+    <h2>
+    Username: {{ journalist.username }}
+    </h2>
+    <p>
+    {{ journalist.journalist_profile.biography }}
+    </p>
+    {% if journalist.profile_picture %}
+        <img src="{{ journalist.profile_picture.url }}" alt="{{ journalist.display_name }}"  class="img-fluid rounded shadow-sm d-block my-3" style="max-width: 800px; height: 350px; object-fit: cover;">
+    {% else %}
+        <p>No image attached.</p>
+    {% endif %}
+    <p class="fs-5 mb-1">
+     Contact Number: {{ journalist.contact_number }}
+    </p>
+    <p class="fs-5 mb-1">
+        Date of Birth: {{ journalist.date_of_birth|date:"j F Y" }}
+    </p>
+    <p class="fs-5 mb-1">
+        Subscribers: {{ journalist.journalist_profile.subscribers.count|default:0 }}
+    </p>
+    <p class="fs-5 mb-1">
+        Articles Written: {{ journalist.articles_authored.count |default:0 }}
+    </p>
+    
+</div>
+<a href="{% url 'reader_view_article_page' previous_article_id %}" class = "btn btn-secondary me-3">
+    Back to Article Details
+</a>
+
+{% if not reader_subscribed %}
+    <a href="{% url 'reader_journalist_subscribe_unsubscribe_page' journalist.id previous_article_id %}" class="btn btn-success me-3">
+        Subscribe to {{ journalist.display_name }}
+    </a>
+{% else %}
+    <a href="{% url 'reader_journalist_subscribe_unsubscribe_page' journalist.id previous_article_id %}" class="btn btn-warning me-3">
+        Unsubscribe from {{ journalist.display_name }}
+    </a>
+{% endif %}
+
+{% endblock %}

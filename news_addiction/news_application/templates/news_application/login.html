@@ -1,0 +1,22 @@
+<!-- news_application\templates\news_application\login.html -->
+{% extends "base.html" %}
+{% block content %}
+  <h1 class="mb-3">Login</h1>
+  <form class="mb-3" method="post" action="{% url 'login_page' %}">
+    {% csrf_token %}
+    <div class="mb-3">
+      {{ form.username.label_tag }} {{ form.username }}
+    </div>
+    <div class="mb-3">
+      {{ form.password.label_tag }} {{ form.password }}
+    </div>
+    {% if form.non_field_errors %}
+      <div class="text-danger">
+          {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+    <button class = "btn btn-primary me-3" type="submit">Log in</button>
+  </form>
+<p>Don't have an account? <a class="btn btn-outline-primary btn-sm" href="{% url 'register_new_user_page' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Create one</a></p>
+<p>Forgot Password? <a class="btn btn-outline-primary btn-sm" href="{% url 'request_reset_password_page' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Reset Password</a></p>
+{% endblock %}

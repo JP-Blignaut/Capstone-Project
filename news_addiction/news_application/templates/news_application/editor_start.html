@@ -1,0 +1,19 @@
+<!-- eCommerce\templates\eCommerce\login.html -->
+{% extends "base.html" %}
+{% block content %}
+<h1 class="mb-4 text-center">Editor Management Dashboard:</h1>
+{% if assigned_publishers %}
+  <h3 class="mb-4 text-center">Assigned Publishers:</h3>
+  {% for publisher in assigned_publishers %}
+    <div class="text-center">
+      <a href="{% url 'editor_publisher_dashboard_page' pk=publisher.pk %}" class="btn btn-primary btn-lg me-3 mb-3" style="padding: 20px 40px; font-size: 1.5rem;">
+          {{ publisher.name }}
+      </a>
+    </div>
+  {% endfor %}
+{% else %}
+                <h4 class="text-muted">No publishers available</h4>
+                <p class="text-muted">There are currently no publishers who have assigned you as an editor.</p>
+                <p class="text-danger">Editors are assigned to specific publishers in the Django admin console.</p>
+{% endif %}
+{% endblock %}

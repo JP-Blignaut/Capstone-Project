@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>{{ page_title }}</h2>
+            
+            <!-- Publisher Information -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">{{ publisher.name }}</h5>
+                    <p class="card-text">{{ publisher.description }}</p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            Email: {{ publisher.email }}
+                        </small>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <a href="{% url 'editor_journalist_assign_page' publisher.pk %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Assign Journalist to Publisher
+                    </a>
+                </div>
+            </div>
+
+            <!-- Inventory Items Table -->
+            {% if journalists %}
+                <div class="card">
+                    <div class="card-header">
+                        <h5> Assigned Journalists ({{ journalists.count }} items)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Profile Picture</th>
+                                        <th>User Name</th>
+                                        <th>Display Name</th>
+                                        <th>Email</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for journalist in journalists %}
+                                    <tr>
+                                        <td>
+                                            {% if journalist.profile_picture %}
+                                                <img src="{{ journalist.profile_picture.url }}" 
+                                                     alt="{{ journalist.username }}" 
+                                                     style="width: 50px; height: 50px; object-fit: cover;" 
+                                                     class="rounded">
+                                            {% else %}
+                                                <div class="bg-light d-flex align-items-center justify-content-center rounded" 
+                                                     style="width: 50px; height: 50px;">
+                                                    <small class="text-muted">No Image</small>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <strong>{{ journalist.username }}</strong><br>
+                                            <small class="text-muted">ID: {{ journalist.id }}</small>
+                                        </td>
+                                        <td>
+                                            <strong>{{ journalist.display_name}}</strong>
+                                        </td>
+                                        <td>
+                                            <strong>{{ journalist.email }}</strong>
+                                        </td>
+                                      
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                               <a href="{% url 'editor_journalist_remove_assignment_page' publisher.pk journalist.pk %}" 
+                                                   class="btn btn-danger" title="Remove">
+                                                    Unassign from Publisher
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <h5>No Journalists Assigned</h5>
+                    <p>This publisher doesn't have any journalists assigned yet.</p>
+                    <a href="{% url 'editor_journalist_assign_page' publisher.pk %}" class="btn btn-primary">
+                        Assign Your First Journalist
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+     <a href="{% url 'editor_publisher_dashboard_page' pk=publisher.pk %}" class = "btn btn-secondary me-3">
+      Return to Publisher Management Dashboard
+    </a>
+    </div>
+</div>
+{% endblock %}

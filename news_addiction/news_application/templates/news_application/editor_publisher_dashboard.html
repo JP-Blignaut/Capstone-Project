@@ -1,0 +1,27 @@
+<!-- news_application\templates\news_application\editor_publisher_dashboard.html -->
+{% extends "base.html" %}
+{% block content %}
+  <h1 class="mb-4 text-center">Editor Management Dashboard - {{publisher.name}}:</h1>
+    <div class="text-center">
+      <a href="{% url 'editor_journalist_management_page' publisher.pk %}" class="btn btn-primary btn-lg me-3 mb-3" style="padding: 20px 40px; font-size: 1.5rem;">
+          Journalists
+      </a>
+      <a href="{% url 'editor_article_management_page' publisher.pk %}" class="btn btn-success btn-lg me-3 mb-3" style="padding: 20px 40px; font-size: 1.5rem;">
+          Articles
+      </a>
+      <!-- <a href="{% url 'editor_start_page' %}" class="btn btn-danger btn-lg me-3 mb-3" style="padding: 20px 40px; font-size: 1.5rem;">
+          Newsletters
+      </a> -->
+
+      <p>
+        <br>
+        <br>
+        <br>
+        <a href="{% url 'editor_start_page' %}" class = "btn btn-secondary me-3">
+          Back to Assigned Publishers List
+        </a>
+      </p>
+    </div>
+
+    
+{% endblock %}

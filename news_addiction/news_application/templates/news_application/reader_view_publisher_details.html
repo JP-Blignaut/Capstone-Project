@@ -1,0 +1,42 @@
+<!-- eCommerce\templates\eCommerce\vendor_product_detail.html -->
+{% extends "base.html" %}
+{% block content %}
+  <h1 class="mb-3">Publisher Profile: {{ publisher.name }}</h1>
+<div class="product p-4 mb-4 rounded shadow border border-3 border-primary">
+    <p>
+    {{ publisher.journalist_profile.biography }}
+    </p>
+    {% if publisher.logo %}
+        <img src="{{ publisher.logo.url }}" alt="{{ publisher.name }}"  class="img-fluid rounded shadow-sm d-block my-3" style="max-width: 800px; height: 350px; object-fit: cover;">
+    {% else %}
+        <p>No image attached.</p>
+    {% endif %}
+
+    <p class="fs-5 mb-1">
+    <a href="{{ publisher.website }}" class="fs-5 mb-1" target="_blank">
+        Website: {{ publisher.website }}
+    </a>
+    </p>
+    <p class="fs-5 mb-1">
+        Subscribers: {{ publisher.subscribers.count|default:0 }}
+    </p>
+    <p class="fs-5 mb-1">
+        Articles Published: {{ articles_published |default:0 }}
+    </p>
+    
+</div>
+<a href="{% url 'reader_start_page' %}" class = "btn btn-secondary me-3">
+    Back to Article List
+</a>
+
+{% if not reader_subscribed %}
+    <a href="{% url 'reader_publisher_subscribe_unsubscribe_page' publisher.id article.id %}" class="btn btn-success me-3">
+        Subscribe to {{ publisher.name }}
+    </a>
+{% else %}
+    <a href="{% url 'reader_publisher_subscribe_unsubscribe_page' publisher.id article.id %}" class="btn btn-warning me-3">
+        Unsubscribe from {{ publisher.name }}
+    </a>
+{% endif %}
+
+{% endblock %}

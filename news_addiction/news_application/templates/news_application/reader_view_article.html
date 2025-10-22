@@ -1,0 +1,35 @@
+<!-- eCommerce\templates\eCommerce\vendor_product_detail.html -->
+{% extends "base.html" %}
+{% block content %}
+  <h1 class="mb-3">Article Details: {{ article.title }}</h1>
+<div class="product p-4 mb-4 rounded shadow border border-3 border-primary">
+    <h2>
+        {{ article.title }}
+    </h2>
+    <p>
+        {{ article.content }}
+    </p>
+    {% if article.image %}
+        <img src="{{ article.image.url }}" alt="{{ article.title }}"  class="img-fluid rounded shadow-sm d-block my-3" style="max-width: 800px; height: 350px; object-fit: cover;">
+    {% else %}
+        <p>No image attached.</p>
+    {% endif %}
+    <p class="fs-5 mb-1">
+        <strong>Author:</strong>
+        <a href="{% url 'reader_view_journalist_details_page' article.author.id article.id %}" class="link-primary text-decoration-none">
+            {{ article.author.display_name }}
+        </a>
+    </p>
+    <p class="fs-5 mb-1">
+        <strong>Publisher:</strong>
+        <a href="{% url 'reader_view_publisher_details_page' article.id %}" class="link-primary text-decoration-none">
+            {{ article.get_publisher_name }}
+        </a>
+    </p>
+    <p class="mb-0">Publication Date: {{ article.publication_date|date:"F j, Y" }} </p>
+    <p class="mb-0">Category: {{ article.get_category_display }} </p>
+</div>
+<a href="{% url 'reader_start_page' %}" class = "btn btn-secondary me-3">
+    Back to Article List
+</a>
+{% endblock %}

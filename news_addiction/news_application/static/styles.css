@@ -1,0 +1,63 @@
+  /* Grid layout for notes */
+  .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+  }
+
+  /* Square note cards */
+  .note-card {
+      aspect-ratio: 1 / 1;
+      /* makes squares */
+      border-radius: 8px;
+      padding: 10px;
+      color: #333;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease;
+  }
+
+  .note-card:hover {
+      transform: translateY(-4px);
+  }
+
+  .note-card h3 {
+      margin: 0 0 5px 0;
+      font-size: 1rem;
+  }
+
+  .note-card a {
+      color: inherit;
+      text-decoration: none;
+      font-weight: bold;
+  }
+
+  .note-card .note-date {
+      font-size: 0.8rem;
+      color: #555;
+  }
+
+  .add-note-link {
+      text-decoration: none;
+      background-color: #4caf50;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: bold;
+  }
+
+  .add-note-link:hover {
+      background-color: #45a049;
+  }
+
+.scaled-img {
+  width: 100%;          /* make image fill its container width */
+  max-width: 600px;     /* cap horizontal size */
+  height: 250px;        /* fixed height so object-fit can crop properly */
+  object-fit: cover;    /* crop to fill width/height while preserving aspect */
+  display: block;       /* remove inline gap issues */
+}

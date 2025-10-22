@@ -1,0 +1,33 @@
+<!-- eCommerce/templates/eCommerce/vendor_store_delete_confirm.html -->
+{% extends 'base.html' %}
+
+{% block title %}Delete Article - {{ article.title }}{% endblock %}
+
+{% block content %}
+<h2>Confirm Deletion</h2>
+
+<p><strong>Warning:</strong> This action cannot be undone.</p>
+
+<p>Are you sure you want to delete the following Article?</p>
+
+<div style="border: 1px solid #ddd; padding: 15px; margin: 20px 0; background-color: #000000;">
+    <h3>{{ article.title }}</h3>
+    <p>{{ article.content }}</p>
+    {% if article.image %}
+        <img src="{{ article.image.url }}" alt="{{ article.title }}"  class="img-fluid rounded shadow-sm d-block my-3" style="max-width: 800px; height: 350px; object-fit: cover;">
+    {% else %}
+        <p>No image attached.</p>
+    {% endif %}
+</div>
+
+<form method="post" style="display: inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">
+        Yes, Delete Article
+    </button>
+</form>
+
+<a href="{% url 'journalist_article_detail_page' article.pk %}" class="btn btn-secondary">
+    Cancel
+</a>
+{% endblock %}

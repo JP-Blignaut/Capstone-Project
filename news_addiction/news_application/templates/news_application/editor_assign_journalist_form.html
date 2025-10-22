@@ -1,0 +1,47 @@
+<!-- news_application\templates\news_application\journalist_article_form.html -->
+{% extends 'base.html' %}
+{% block title %}
+    Publisher Management - Assign Journalist
+{% endblock %}
+{% block content %}
+<h2>
+    Assign Journalist to Publisher - {{ publisher.name }}
+</h2>
+{# Show non-field errors at the top so user sees form-level problems #}
+{% if form.non_field_errors %}
+  <div class="text-danger mb-3">
+    {{ form.non_field_errors }}
+  </div>
+{% endif %}
+<form method="post" enctype="multipart/form-data" 
+     action="{% url 'editor_journalist_assign_page' pk=form.instance.pk %}">
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="mb-3">
+            {{ field.label_tag }}
+            {{ field }}
+            {# Per-field errors shown immediately under the field #}
+            {% if field.errors %}
+              <div class="text-danger">
+                {{ field.errors }}
+              </div>
+            {% endif %}
+            {% if field.help_text %}
+            <div class="form-text">{{ field.help_text }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% if form.non_field_errors %}
+      <div class="text-danger">
+          {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+    <button type="submit" class = "btn btn-primary me-3">
+      Assign Journalist to Publisher
+    </button>
+</form>
+<div class="mt-2"></div>
+  <a href="{% url 'editor_journalist_management_page' pk=publisher.pk %}" class = "btn btn-secondary me-3">
+    Back to Publisher Management
+  </a>
+{% endblock %}

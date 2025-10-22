@@ -1,0 +1,51 @@
+<!-- eCommerce\templates\eCommerce\login.html -->
+{% extends "base.html" %}
+{% block content %}
+  <h1 class="mb-3">Manage Articles for Journalist: {{user.display_name}}</h1>
+  <p>
+    <a href="{% url 'journalist_article_add_page' %}" class="add-note-link btn btn-primary me-3">➕ Add Article</a>
+  </p>
+
+  <div class="product-grid">
+    {% for article in articles %}
+      <div class="product-card col-md-6 p-2 mb-2 rounded shadow border border-3 border-primary">
+        <h3>
+            <a href="{% url 'journalist_article_detail_page' pk=article.id %}" >
+                {{ article.title }}
+            </a>
+        </h3>
+        <p class="mb-0">Created on: {{ article.created_at}}</p>
+        <p class="mb-0 fs-5">
+          <strong>Publication Status:</strong>
+          <span class="badge bg-info text-dark">
+            {{ article.get_publication_status_display }}
+          </span>
+        </p>
+        <p class="mb-0">Category: {{ article.get_category_display }}</p>
+        {% if article.publication_status == ArticleStatus.DRAFT %}
+        <div class="text-end">
+          <form method="post" action="{% url 'journalist_article_publish_page' pk=article.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">
+              📢 Publish
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endif%}
+  </div>
+
+    {% empty %}
+      <p>No articles available for user.</p>
+      <p>
+        <a href="{% url 'journalist_article_add_page' %}" class = "btn btn-primary me-3">
+          Create one!
+        </a>
+      </p>
+    {% endfor %}
+    <a href="{% url 'journalist_start_page' %}" class = "btn btn-secondary me-3">
+      Return to Journalist Management Dashboard
+    </a>
+  </div>
+  
+{% endblock %}

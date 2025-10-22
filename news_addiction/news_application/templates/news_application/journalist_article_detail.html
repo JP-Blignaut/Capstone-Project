@@ -1,0 +1,43 @@
+<!-- eCommerce\templates\eCommerce\vendor_product_detail.html -->
+{% extends "base.html" %}
+{% block content %}
+  <h1 class="mb-3">Article Details:</h1>
+<div class="product p-4 mb-4 rounded shadow border border-3 border-primary">
+    <h2>
+        {{ article.title }}
+    </h2>
+    <p>
+        {{ article.content }}
+    </p>
+    {% if article.image %}
+        <img src="{{ article.image.url }}" alt="{{ article.title }}"  class="img-fluid rounded shadow-sm d-block my-3" style="max-width: 800px; height: 350px; object-fit: cover;">
+    {% else %}
+        <p>No image attached.</p>
+    {% endif %}
+    <p class="mb-0 fs-5">
+        <strong>Publication Status:</strong>
+        <span class="badge bg-info text-dark">
+            {{ article.get_publication_status_display }}
+        </span>
+    </p>
+    <p class="mb-0"> Created at: {{ article.created_at }} </p>
+    <p class="mb-0"> Last Modified at: {{ article.updated_at }} </p>
+    <p class="mb-0"> Category: {{ article.get_category_display }} </p>
+    <p class="mb-0"> Published: {{ article.published }} </p>
+     {% if article.published %}
+        <p class="mb-0"> Published on: {{ article.publication_date }} </p>
+        <p class="mb-0"> Published by: {{ article.get_publisher_name }} </p>
+    {% endif %}
+    
+</div>
+<a href="{% url 'journalist_article_edit_page' pk=article.pk %}" class = "btn btn-primary me-3">
+    Update Article
+</a>
+<a href="{% url 'journalist_article_delete_page' pk=article.pk %}" class = "btn btn-danger me-3">
+    Delete Article
+</a>
+
+<a href="{% url 'journalist_article_management_page' %}" class = "btn btn-secondary me-3">
+    Back to Article List
+</a>
+{% endblock %}

@@ -1,0 +1,61 @@
+<!-- eCommerce\templates\eCommerce\login.html -->
+{% extends "base.html" %}
+{% block content %}
+  <h1 class="mb-3">Manage Articles for Publisher: {{publisher.name}}
+    <img src="{{ publisher.logo.url }}" alt="News Addiction logo"
+          style="height:100px; width:auto;" class="me-3">
+  </h1>
+  <!-- <p>
+    <a href="{% url 'journalist_article_add_page' %}" class="add-note-link btn btn-primary me-3">➕ Add Article</a>
+  </p> -->
+
+  <div class="product-grid">
+    {% for article in articles %}
+      <div class="product-card col-md-6 p-2 mb-2 rounded shadow border border-3 border-primary">
+        <h3>
+            <a href="{% url 'editor_article_detail_page' pk=article.id %}" >
+                {{ article.title }}
+            </a>
+        </h3>
+        <p class="mb-0"><strong>Author:</strong> {{ article.author.display_name }}</p>
+        <p class="mb-0"><strong>Created on:</strong> {{ article.created_at}}</p>
+        <p class="mb-0"><strong>Publisher:</strong> {{ article.get_publisher_name }}</p>
+        <p class="mb-0"><strong>Category:</strong> {{ article.get_category_display }}</p>
+        <p class="mb-0 fs-5">
+          <strong>Publication Status:</strong>
+          <span class="badge bg-info text-dark">
+            {{ article.get_publication_status_display }}
+          </span>
+        </p>
+       
+        {% if article.publication_status == ArticleStatus.AWAITING_APPROVAL %}
+        <div class="text-end">
+          <a href="{% url 'editor_article_accept_for_publication_page' pk=article.pk %}" 
+             class="btn btn-success mb-2"
+             onclick="return confirm('Are you sure you want to accept this article for publication?')">
+            📢 Approve For Publication
+          </a>
+          <a href="{% url 'editor_article_reject_for_publication_page' pk=article.pk %}" 
+             class="btn btn-danger mb-2"
+             onclick="return confirm('Are you sure you want to reject this article for publication?')">
+            ❌ Reject For Publication
+          </a>
+        </div>
+      </div>
+      {% endif%}
+  </div>
+
+    {% empty %}
+      <p>No articles available for Publisher.</p>
+      <!-- <p>
+        <a href="{% url 'journalist_article_add_page' %}" class = "btn btn-primary me-3">
+          Create one!
+        </a>
+      </p> -->
+    {% endfor %}
+    <a href="{% url 'editor_publisher_dashboard_page' publisher.pk %}" class = "btn btn-secondary me-3">
+      Return to Editor Management Dashboard
+    </a>
+  </div>
+  
+{% endblock %}

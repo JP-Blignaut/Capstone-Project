@@ -1,0 +1,118 @@
+<!-- eCommerce\templates\eCommerce\login.html -->
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+  <h1 class="mb-4 text-center">Welcome to News Addiction! - All the Latest News at Your Fingertips</h1>
+
+<!-- Search Form -->
+<div class="row mb-4">
+    <div class="col-md-8 offset-md-2">
+        <form method="GET" action="{% url 'reader_start_page' %}" class="card">
+            <div class="card-body">
+                <div class="input-group">
+                    <input type="text" 
+                           name="search" 
+                           class="form-control" 
+                           placeholder="Search articles by title..." 
+                           value="{{ search_query }}"
+                           aria-label="Search products">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    {% if search_query %}
+                        <a href="{% url 'reader_start_page' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Clear
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Article Items Table -->
+{% if articles %}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Title</th>
+                            <th>Publication Date</th>
+                            <th>Author</th>
+                            <th>Publisher</th>
+                            <th>Category</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for article in articles %}
+                        {% if article.published %}
+                        <tr>
+                            <td>
+                                {% if article.image %}
+                                    <img src="{{ article.image.url }}" alt="{{ article.title }}" class="img-thumbnail" style="height: 100px; width: auto;">
+                                {% else %}
+                                    <img src="{% static 'images/No_Image.png' %}" alt="Default Image" class="img-thumbnail" style="height: 100px; width: auto;">
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ article.title|truncatewords:10 }}
+                            </td>
+                            <td>
+                              {{ article.publication_date|date:"SHORT_DATE_FORMAT" }}
+
+                            </td>
+                            <td>
+                                {{ article.author.display_name }}
+                            </td>
+                            <td>
+                                {{ article.get_publisher_name }}
+                            </td>
+                            <td>
+                                {{ article.get_category_display }}
+                            </td>
+                                                  
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'reader_view_article_page' article.pk %}" 
+                                        class="btn btn-primary" title="View Article">
+                                        View Article
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <div class="mb-3">
+                <i class="fas fa-search fa-3x text-muted"></i>
+            </div>
+            {% if search_query %}
+                <h4 class="text-muted">No Articles found</h4>
+                <p class="text-muted">
+                    No articles matching "<strong>{{ search_query }}</strong>" were found.
+                    <br>Try searching with different keywords or 
+                    <a href="{% url 'reader_start_page' %}" class="text-decoration-none">browse all articles</a>.
+                </p>
+            {% else %}
+                <h4 class="text-muted">No articles available</h4>
+                <p class="text-muted">There are currently no articles published.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+</div>
+  
+{% endblock %}
