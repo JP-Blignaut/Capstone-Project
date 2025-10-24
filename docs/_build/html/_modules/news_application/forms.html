@@ -1,0 +1,407 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>news_application.forms &mdash; Capstone Project 00.00.01 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d7bb8d4d"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Capstone Project
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">news_addiction</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Capstone Project</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">news_application.forms</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for news_application.forms</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">forms</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.mail</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmailMessage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">Article</span><span class="p">,</span> <span class="n">User</span><span class="p">,</span> <span class="n">ReaderProfile</span><span class="p">,</span> <span class="n">JournalistProfile</span><span class="p">,</span> 
+                     <span class="n">EditorProfile</span><span class="p">,</span> <span class="n">Roles</span><span class="p">,</span> <span class="n">ArticleCategory</span><span class="p">,</span> <span class="n">Publisher</span><span class="p">,</span>
+                     <span class="n">ArticleStatus</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserCreationForm</span><span class="p">,</span> <span class="n">PasswordResetForm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span>  <span class="n">Group</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.validators</span><span class="w"> </span><span class="kn">import</span> <span class="n">URLValidator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.contenttypes.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContentType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+
+<div class="viewcode-block" id="CustomUserCreationForm">
+<a class="viewcode-back" href="../../news_application.html#news_application.forms.CustomUserCreationForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomUserCreationForm</span><span class="p">(</span><span class="n">UserCreationForm</span><span class="p">):</span>
+    <span class="c1"># A Custom user creation form that includes an email address and </span>
+    <span class="c1"># group selection.</span>
+
+
+    <span class="n">email</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">EmailField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="n">Roles</span><span class="o">.</span><span class="n">choices</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                              <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Role&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CustomUserCreationForm.Meta">
+<a class="viewcode-back" href="../../news_application.html#news_application.forms.CustomUserCreationForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">User</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="s2">&quot;password1&quot;</span><span class="p">,</span> <span class="s2">&quot;password2&quot;</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;display_name&quot;</span><span class="p">,</span> <span class="s2">&quot;phone_number&quot;</span><span class="p">,</span> <span class="s2">&quot;date_of_birth&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;profile_picture&quot;</span><span class="p">)</span>
+        <span class="n">widgets</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;date_of_birth&quot;</span><span class="p">:</span> <span class="n">forms</span><span class="o">.</span><span class="n">DateInput</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;date&quot;</span><span class="p">})</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="CustomUserCreationForm.save">
+<a class="viewcode-back" href="../../news_application.html#news_application.forms.CustomUserCreationForm.save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">commit</span><span class="p">:</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">user</span></div>
+</div>
+
+    
+
+<div class="viewcode-block" id="CustomPasswordResetForm">
+<a class="viewcode-back" href="../../news_application.html#news_application.forms.CustomPasswordResetForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomPasswordResetForm</span><span class="p">(</span><span class="n">PasswordResetForm</span><span class="p">):</span>
+    <span class="c1"># A custom password reset form that uses both username and </span>
+    <span class="c1"># email to identify the user.</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Username&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">EmailField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Email&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">254</span><span class="p">)</span>
+    
+    <span class="c1"># Specify field order to ensure username appears first</span>
+    <span class="n">field_order</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;email&quot;</span><span class="p">]</span> 
+
+<div class="viewcode-block" id="CustomPasswordResetForm.get_users">
+<a class="viewcode-back" href="../../news_application.html#news_application.forms.CustomPasswordResetForm.get_users">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_users</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">):</span>
+        <span class="c1"># Override get_users to filter by both email and username</span>
+        <span class="n">username</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span>
+        <span class="n">email</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;email&quot;</span><span class="p">)</span>
+        <span class="n">active_users</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">_default_manager</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">email__iexact</span><span class="o">=</span><span class="n">email</span><span class="p">,</span>
+            <span class="n">username__iexact</span><span class="o">=</span><span class="n">username</span><span class="p">,</span>
+            <span class="n">is_active</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">active_users</span> <span class="k">if</span> <span class="n">u</span><span class="o">.</span><span class="n">has_usable_password</span><span class="p">())</span></div>
+
+    
+<div class="viewcode-block" id="CustomPasswordResetForm.build_email">
+<a class="viewcode-back" href="../../news_application.html#news_application.forms.CustomPasswordResetForm.build_email">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_email</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">reset_url</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds a password reset email.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            user (User): The user requesting the password reset.</span>
+<span class="sd">            reset_url (str): The URL to reset the password.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            EmailMessage: The constructed email message.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">subject</span> <span class="o">=</span> <span class="s2">&quot;Password Reset Requested&quot;</span>
+        <span class="n">user_email</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span>
+        <span class="n">domain_email</span> <span class="o">=</span> <span class="s2">&quot;example@domain.com&quot;</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Hi </span><span class="si">{</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">,</span><span class="se">\n</span><span class="s2">Here is your link to reset your &quot;</span>
+        <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;password: </span><span class="si">{</span><span class="n">reset_url</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">email</span> <span class="o">=</span> <span class="n">EmailMessage</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">domain_email</span><span class="p">,</span> <span class="p">[</span><span class="n">user_email</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">email</span></div>
+</div>
+
+    
+<div class="viewcode-block" id="ArticleForm">
+<a class="viewcode-back" href="../../news_application.html#news_application.forms.ArticleForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ArticleForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="n">ArticleCategory</span><span class="o">.</span><span class="n">choices</span><span class="p">,</span> 
+                                 <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                                <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Category&quot;</span>
+                                <span class="p">)</span>
+<div class="viewcode-block" id="ArticleForm.Meta">
+<a class="viewcode-back" href="../../news_application.html#news_application.forms.ArticleForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Article</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span> <span class="s2">&quot;category&quot;</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">]</span>
+        <span class="n">widgets</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">forms</span><span class="o">.</span><span class="n">TextInput</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;form-control&quot;</span><span class="p">}),</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">forms</span><span class="o">.</span><span class="n">Textarea</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;form-control&quot;</span><span class="p">,</span> 
+                                             <span class="s2">&quot;rows&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}),</span>
+            <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="n">forms</span><span class="o">.</span><span class="n">ClearableFileInput</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;form-control&quot;</span><span class="p">})</span>
+        <span class="p">}</span></div>
+</div>
+
+
+<div class="viewcode-block" id="EditorArticleForm">
+<a class="viewcode-back" href="../../news_application.html#news_application.forms.EditorArticleForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EditorArticleForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Editor Article Form that allows the editor to also adjust the </span>
+<span class="sd">       publication status, effectively removing an article from publication.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="n">ArticleCategory</span><span class="o">.</span><span class="n">choices</span><span class="p">,</span> 
+                                 <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                                <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Category&quot;</span>
+                                <span class="p">)</span>
+    
+    <span class="c1"># Define published field with explicit choices for better UX</span>
+    <span class="n">publication_status</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span>
+        <span class="n">choices</span><span class="o">=</span><span class="n">ArticleStatus</span><span class="o">.</span><span class="n">choices</span><span class="p">,</span>
+        <span class="n">widget</span><span class="o">=</span><span class="n">forms</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;form-control&quot;</span><span class="p">}),</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Publication Status&quot;</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    
+<div class="viewcode-block" id="EditorArticleForm.Meta">
+<a class="viewcode-back" href="../../news_application.html#news_application.forms.EditorArticleForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Article</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span> <span class="s2">&quot;category&quot;</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">,</span> 
+                  <span class="s2">&quot;publication_status&quot;</span><span class="p">]</span>
+        <span class="n">widgets</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">forms</span><span class="o">.</span><span class="n">TextInput</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;form-control&quot;</span><span class="p">}),</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">forms</span><span class="o">.</span><span class="n">Textarea</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;form-control&quot;</span><span class="p">,</span> 
+                                             <span class="s2">&quot;rows&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}),</span>
+            <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="n">forms</span><span class="o">.</span><span class="n">ClearableFileInput</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;form-control&quot;</span><span class="p">})</span>
+        <span class="p">}</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ArticlePublishForm">
+<a class="viewcode-back" href="../../news_application.html#news_application.forms.ArticlePublishForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ArticlePublishForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Form for journalists to publish articles with publisher selection.</span>
+<span class="sd">    Allows selection from assigned publishers or self-publishing option.</span>
+<span class="sd">    Only allows modification of publisher and publication date.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">PUBLISH_DIRECTLY</span> <span class="o">=</span> <span class="s2">&quot;DIRECT&quot;</span>
+    <span class="n">DEFAULT_CHOICES</span> <span class="o">=</span> <span class="p">[(</span><span class="n">PUBLISH_DIRECTLY</span><span class="p">,</span> <span class="s2">&quot;Publish Directly (Self-Published)&quot;</span><span class="p">)]</span>
+    <span class="c1"># Build choices for publisher selection</span>
+    <span class="n">publisher_choice</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span>
+        <span class="n">choices</span><span class="o">=</span><span class="p">[],</span>  <span class="c1"># Will be populated in __init__</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Publication Option&quot;</span><span class="p">,</span>
+        <span class="n">widget</span><span class="o">=</span><span class="n">forms</span><span class="o">.</span><span class="n">RadioSelect</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Choose how you want to publish this article</span><span class="se">\n</span><span class="s2">Once &quot;</span>
+        <span class="s2">&quot;published, an article will be available to all readers.&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+    
+<div class="viewcode-block" id="ArticlePublishForm.Meta">
+<a class="viewcode-back" href="../../news_application.html#news_application.forms.ArticlePublishForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Article</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">is_journalist</span><span class="p">():</span>
+            <span class="c1"># Get the publishers assigned to the journalist:</span>
+            <span class="n">assigned_publishers</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">publishers_you_write_for</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            
+            <span class="c1"># Create a LOCAL copy of choices for this instance</span>
+            <span class="n">choices</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_CHOICES</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">publisher</span> <span class="ow">in</span> <span class="n">assigned_publishers</span><span class="p">:</span>
+                <span class="n">choices</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">publisher</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> 
+                                <span class="sa">f</span><span class="s2">&quot;Publish through </span><span class="si">{</span><span class="n">publisher</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;publisher_choice&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">choices</span> <span class="o">=</span> <span class="n">choices</span>
+            
+            <span class="c1"># If no assigned publishers, only show direct publishing option</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">assigned_publishers</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;publisher_choice&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">help_text</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;You are not assigned to any publishers. &quot;</span>
+                    <span class="s2">&quot;Your article will be self-published.&quot;</span>
+                <span class="p">)</span>
+                    
+<div class="viewcode-block" id="ArticlePublishForm.save">
+<a class="viewcode-back" href="../../news_application.html#news_application.forms.ArticlePublishForm.save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">article</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        
+        <span class="c1"># Handle publisher assignment based on selection</span>
+        <span class="n">publisher_choice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;publisher_choice&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">publisher_choice</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">PUBLISH_DIRECTLY</span><span class="p">:</span>
+            <span class="c1"># Set publisher to the journalist&quot;s profile for self-publishing</span>
+        
+            <span class="n">content_type</span> <span class="o">=</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_for_model</span><span class="p">(</span><span class="n">article</span><span class="o">.</span><span class="n">author</span><span class="p">)</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">publisher_content_type</span> <span class="o">=</span> <span class="n">content_type</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">publisher_object_id</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">author</span><span class="o">.</span><span class="n">id</span>
+            <span class="c1"># Only publish automatically if published directly:</span>
+            <span class="k">if</span> <span class="n">publisher_choice</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">PUBLISH_DIRECTLY</span><span class="p">:</span>
+                <span class="n">article</span><span class="o">.</span><span class="n">publication_status</span> <span class="o">=</span> <span class="n">ArticleStatus</span><span class="o">.</span><span class="n">PUBLISHED</span>
+                <span class="n">article</span><span class="o">.</span><span class="n">publication_date</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Set publisher to the selected Publisher</span>
+            <span class="n">publisher_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">publisher_choice</span><span class="p">)</span>
+            <span class="n">publisher</span> <span class="o">=</span> <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">publisher_id</span><span class="p">)</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">publisher_content_type</span> <span class="o">=</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_for_model</span><span class="p">(</span>
+                <span class="n">Publisher</span><span class="p">)</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">publisher_object_id</span> <span class="o">=</span> <span class="n">publisher</span><span class="o">.</span><span class="n">id</span>
+            <span class="c1"># If publishing through a publisher, set status to pending:</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">publication_status</span> <span class="o">=</span> <span class="n">ArticleStatus</span><span class="o">.</span><span class="n">AWAITING_APPROVAL</span>  
+
+        
+        
+        <span class="k">if</span> <span class="n">commit</span><span class="p">:</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        
+        <span class="k">return</span> <span class="n">article</span></div>
+</div>
+
+    
+
+
+<div class="viewcode-block" id="AssignJournalistsToPublisherForm">
+<a class="viewcode-back" href="../../news_application.html#news_application.forms.AssignJournalistsToPublisherForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AssignJournalistsToPublisherForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Form for assigning journalists to a publisher.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Build choices for journalist selection</span>
+    <span class="n">journalist_choice</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span>
+        <span class="n">choices</span><span class="o">=</span><span class="p">[],</span>  <span class="c1"># Will be populated in __init__</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Assign Journalist to Publisher&quot;</span><span class="p">,</span>
+        <span class="n">widget</span><span class="o">=</span><span class="n">forms</span><span class="o">.</span><span class="n">Select</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;Choose a journalist to assign to this publisher&quot;</span>
+    <span class="p">)</span>
+    
+<div class="viewcode-block" id="AssignJournalistsToPublisherForm.Meta">
+<a class="viewcode-back" href="../../news_application.html#news_application.forms.AssignJournalistsToPublisherForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Publisher</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">is_editor</span><span class="p">():</span>
+            <span class="c1"># Get all registered journalists:</span>
+            <span class="n">journalists</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">Roles</span><span class="o">.</span><span class="n">JOURNALIST</span><span class="p">)</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span>
+                <span class="n">publishers_you_write_for</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span>
+            <span class="p">)</span>
+            <span class="n">choices</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">journalist</span> <span class="ow">in</span> <span class="n">journalists</span><span class="p">:</span>
+                <span class="n">choices</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">journalist</span><span class="o">.</span><span class="n">id</span><span class="p">),</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">journalist</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;journalist_choice&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">choices</span> <span class="o">=</span> <span class="n">choices</span>
+
+            <span class="c1"># If no assigned journalists, only show direct publishing option</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">journalists</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;journalist_choice&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">help_text</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;No Journalists are registered on the platform. &quot;</span>
+                    <span class="s2">&quot;You cannot assign any journalists at this time.&quot;</span>
+                <span class="p">)</span>
+                    
+<div class="viewcode-block" id="AssignJournalistsToPublisherForm.save">
+<a class="viewcode-back" href="../../news_application.html#news_application.forms.AssignJournalistsToPublisherForm.save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commit</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">publisher</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        
+        <span class="c1"># Handle publisher assignment based on selection</span>
+        <span class="n">journalist_choice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;journalist_choice&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Assign the selected journalist to the Publisher</span>
+        <span class="n">journalist_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">journalist_choice</span><span class="p">)</span>
+        <span class="n">journalist</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">journalist_id</span><span class="p">)</span>
+        <span class="n">publisher</span><span class="o">.</span><span class="n">journalists</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">journalist</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">commit</span><span class="p">:</span>
+            <span class="n">publisher</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        
+        <span class="k">return</span> <span class="n">publisher</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Jacques Blignaut.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

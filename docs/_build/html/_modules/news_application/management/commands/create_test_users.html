@@ -1,0 +1,318 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>news_application.management.commands.create_test_users &mdash; Capstone Project 00.00.01 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=d7bb8d4d"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Capstone Project
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">news_addiction</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Capstone Project</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">news_application.management.commands.create_test_users</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for news_application.management.commands.create_test_users</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.management.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCommand</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">news_application.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Roles</span><span class="p">,</span> <span class="n">User</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.files</span><span class="w"> </span><span class="kn">import</span> <span class="n">File</span>
+
+
+<div class="viewcode-block" id="Command">
+<a class="viewcode-back" href="../../../../news_application.management.commands.html#news_application.management.commands.create_test_users.Command">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Command</span><span class="p">(</span><span class="n">BaseCommand</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create tests users for the news application</span>
+<span class="sd">       Usage:</span>
+<span class="sd">       python manage.py create_test_users</span>
+<span class="sd">       To overwrite existing users:</span>
+<span class="sd">       python manage.py create_test_users --skip-existing</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">image_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
+                             <span class="s2">&quot;images&quot;</span><span class="p">)</span>
+    <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;Create test users for the news application&#39;</span>
+
+<div class="viewcode-block" id="Command.add_arguments">
+<a class="viewcode-back" href="../../../../news_application.management.commands.html#news_application.management.commands.create_test_users.Command.add_arguments">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">):</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;--overwrite-existing&#39;</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Overwrite existing users&#39;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Command.handle">
+<a class="viewcode-back" href="../../../../news_application.management.commands.html#news_application.management.commands.create_test_users.Command.handle">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create default users for the news application</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="c1"># Define default users to create</span>
+        <span class="n">test_users</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;admin&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;admin@example.com&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;admin&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;display_name&#39;</span><span class="p">:</span> <span class="s1">&#39;System Administrator&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;phone_number&#39;</span><span class="p">:</span> <span class="s1">&#39;+27123456789&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;date_of_birth&#39;</span><span class="p">:</span> <span class="n">date</span><span class="p">(</span><span class="mi">1990</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="n">Roles</span><span class="o">.</span><span class="n">EDITOR</span><span class="p">,</span>
+                <span class="s1">&#39;is_staff&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s1">&#39;is_superuser&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s1">&#39;profile_picture&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s1">&#39;biography&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;test_editor_1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;test_editor_1@example.com&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;password123&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;display_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Test Editor 1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;phone_number&#39;</span><span class="p">:</span> <span class="s1">&#39;+27123456790&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;date_of_birth&#39;</span><span class="p">:</span> <span class="n">date</span><span class="p">(</span><span class="mi">1985</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span>
+                <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="n">Roles</span><span class="o">.</span><span class="n">EDITOR</span><span class="p">,</span>
+                <span class="s1">&#39;is_staff&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;is_superuser&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;profile_picture&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s1">&#39;biography&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;test_editor_2&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;test_editor_2@example.com&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;password123&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;display_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Test Editor 2&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;phone_number&#39;</span><span class="p">:</span> <span class="s1">&#39;+27123456790&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;date_of_birth&#39;</span><span class="p">:</span> <span class="n">date</span><span class="p">(</span><span class="mi">1985</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span>
+                <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="n">Roles</span><span class="o">.</span><span class="n">EDITOR</span><span class="p">,</span>
+                <span class="s1">&#39;is_staff&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;is_superuser&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;profile_picture&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s1">&#39;biography&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;test_journalist_1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;test_journalist_1@example.com&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;password123&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;display_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Test Journalist 1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;phone_number&#39;</span><span class="p">:</span> <span class="s1">&#39;+27123456791&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;date_of_birth&#39;</span><span class="p">:</span> <span class="n">date</span><span class="p">(</span><span class="mi">1988</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+                <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="n">Roles</span><span class="o">.</span><span class="n">JOURNALIST</span><span class="p">,</span>
+                <span class="s1">&#39;is_staff&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;is_superuser&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;profile_picture&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_dir</span><span class="p">,</span>
+                                                <span class="s1">&#39;Eben.jpeg&#39;</span><span class="p">),</span>
+                <span class="s1">&#39;biography&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;World class enforcer and back to back world &quot;</span>
+                              <span class="s2">&quot;cup winner&quot;</span><span class="p">),</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;test_journalist_2&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;test_journalist_2@example.com&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;password123&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;display_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Test Journalist 2&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;phone_number&#39;</span><span class="p">:</span> <span class="s1">&#39;+27123456791&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;date_of_birth&#39;</span><span class="p">:</span> <span class="n">date</span><span class="p">(</span><span class="mi">1988</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+                <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="n">Roles</span><span class="o">.</span><span class="n">JOURNALIST</span><span class="p">,</span>
+                <span class="s1">&#39;is_staff&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;is_superuser&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;profile_picture&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_dir</span><span class="p">,</span>
+                                                <span class="s1">&#39;Musk.jpeg&#39;</span><span class="p">),</span>
+                <span class="s1">&#39;biography&#39;</span><span class="p">:</span> <span class="s2">&quot;Genius and the world&#39;s richest man&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;test_reader_1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;test_reader_1@example.com&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;password123&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;display_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Test Reader 1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;phone_number&#39;</span><span class="p">:</span> <span class="s1">&#39;+27123456792&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;date_of_birth&#39;</span><span class="p">:</span> <span class="n">date</span><span class="p">(</span><span class="mi">1995</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="n">Roles</span><span class="o">.</span><span class="n">READER</span><span class="p">,</span>
+                <span class="s1">&#39;is_staff&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;is_superuser&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;profile_picture&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s1">&#39;biography&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;test_reader_2&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;test_reader_2@example.com&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;password123&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;display_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Test Reader 2&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;phone_number&#39;</span><span class="p">:</span> <span class="s1">&#39;+27123456792&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;date_of_birth&#39;</span><span class="p">:</span> <span class="n">date</span><span class="p">(</span><span class="mi">1995</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="n">Roles</span><span class="o">.</span><span class="n">READER</span><span class="p">,</span>
+                <span class="s1">&#39;is_staff&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;is_superuser&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;profile_picture&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s1">&#39;biography&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">]</span>
+
+        <span class="n">created_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">skipped_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">user_data</span> <span class="ow">in</span> <span class="n">test_users</span><span class="p">:</span>
+            <span class="n">username</span> <span class="o">=</span> <span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">]</span>
+            
+            <span class="c1"># Check if user already exists</span>
+            <span class="k">if</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;overwrite_existing&#39;</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">WARNING</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s1">&#39;User &quot;</span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s1">&quot; already exists, skipping...&#39;</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">skipped_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">continue</span>
+
+            <span class="c1"># Create the user</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Build user creation arguments dynamically</span>
+                <span class="n">user_args</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;display_name&#39;</span><span class="p">:</span> <span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;display_name&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;phone_number&#39;</span><span class="p">:</span> <span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;phone_number&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;date_of_birth&#39;</span><span class="p">:</span> <span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;date_of_birth&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;role&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;is_staff&#39;</span><span class="p">:</span> <span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;is_staff&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;is_superuser&#39;</span><span class="p">:</span> <span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;is_superuser&#39;</span><span class="p">],</span>
+                <span class="p">}</span>
+
+                <span class="c1"># Add optional fields if they exist and are not None</span>
+                <span class="n">optional_fields</span> <span class="o">=</span> <span class="p">[]</span>
+
+                <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">optional_fields</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">user_data</span> <span class="ow">and</span> <span class="n">user_data</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">user_args</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_data</span><span class="p">[</span><span class="n">field</span><span class="p">]</span>
+
+                <span class="c1"># Handle profile picture separately</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">user_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;profile_picture&#39;</span><span class="p">)</span> <span class="ow">and</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;profile_picture&#39;</span><span class="p">])):</span>
+                    <span class="n">profile_pic_path</span> <span class="o">=</span> <span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;profile_picture&#39;</span><span class="p">]</span>
+                    <span class="n">profile_pic_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">profile_pic_path</span><span class="p">)</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">profile_pic_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">profile_pic_file</span><span class="p">:</span>
+                        <span class="n">user_args</span><span class="p">[</span><span class="s1">&#39;profile_picture&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">File</span><span class="p">(</span>
+                            <span class="n">profile_pic_file</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">profile_pic_filename</span><span class="p">)</span>
+                        <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="o">**</span><span class="n">user_args</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="o">**</span><span class="n">user_args</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="p">(</span><span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;role&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">Roles</span><span class="o">.</span><span class="n">JOURNALIST</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                        <span class="n">user_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;biography&#39;</span><span class="p">)):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Updating biography for journalist:&quot;</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
+                    <span class="n">journalist</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span>
+                    <span class="n">journalist</span><span class="o">.</span><span class="n">journalist_profile</span><span class="o">.</span><span class="n">biography</span> <span class="o">=</span> <span class="n">user_data</span><span class="p">[</span>
+                        <span class="s1">&#39;biography&#39;</span><span class="p">]</span>
+                    <span class="n">journalist</span><span class="o">.</span><span class="n">journalist_profile</span><span class="o">.</span><span class="n">save</span><span class="p">()</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">SUCCESS</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s1">&#39;Successfully created user &quot;</span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
+                        <span class="sa">f</span><span class="s1">&#39;with role &quot;</span><span class="si">{</span><span class="n">user_data</span><span class="p">[</span><span class="s2">&quot;role&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">created_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">ERROR</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s1">&#39;Error creating user &quot;</span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s1">&quot;: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Summary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">SUCCESS</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Summary: Created </span><span class="si">{</span><span class="n">created_count</span><span class="si">}</span><span class="s1"> users, &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;skipped </span><span class="si">{</span><span class="n">skipped_count</span><span class="si">}</span><span class="s1"> users&#39;</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Jacques Blignaut.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

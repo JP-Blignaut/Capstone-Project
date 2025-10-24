@@ -42,12 +42,37 @@ from .functions.tweet import Tweet
 # Create your views here.
 
 def in_group_editor(user):
+    """Returns True if the user is in "Editors" group.
+
+    Args:
+        user (User): The user to check.
+
+    Returns:
+        bool: True if the user is in the "Editors" group, False otherwise.
+    """
     return user.groups.filter(name="Editors").exists()
 
+
 def in_group_reader(user):
+    """Returns True if the user is in "Readers" group.
+
+    Args:
+        user (User): The user to check.
+
+    Returns:
+        bool: True if the user is in the "Readers" group, False otherwise.
+    """
     return user.groups.filter(name="Readers").exists()
 
 def in_group_journalist(user):
+    """Returns True if the user is in "Journalists" group.
+
+    Args:
+        user (User): The user to check.
+
+    Returns:
+        bool: True if the user is in the "Journalists" group, False otherwise.
+    """
     return user.groups.filter(name="Journalists").exists()
 
 def login_view(request):
