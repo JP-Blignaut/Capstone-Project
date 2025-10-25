@@ -15,6 +15,6 @@ class NewsApplicationConfig(AppConfig):
     # twice when using the Django development server due to the auto-reloader.
     # This should have been included in the course material.
         if os.environ.get('RUN_MAIN') == 'true':
-            
-            Tweet()  # Initialize the Tweet singleton instance
-            pass
+            # Skip Twitter initialization in Docker environment
+            if not os.environ.get('DOCKER_ENVIRONMENT'):
+                Tweet()  # Initialize the Tweet singleton instance

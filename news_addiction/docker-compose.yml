@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - static_volume:/app/static
+      - media_volume:/app/media
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db
+      - DOCKER_ENVIRONMENT=true
+    depends_on:
+      - db
+    command: >
+      sh -c "python manage.py collectstatic --noinput &&
+             python manage.py migrate &&
+             python manage.py set_up_test_environment &&
+             python manage.py runserver 0.0.0.0:8000"
+
+  db:
+    image: mysql:8.0
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: news_addiction_db
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: news_user
+      MYSQL_PASSWORD: news_password
+    ports:
+      - "3306:3306"
+
+volumes:
+  mysql_data:
+  static_volume:
+  media_volume:
