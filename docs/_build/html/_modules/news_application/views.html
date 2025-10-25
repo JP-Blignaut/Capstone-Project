@@ -1,0 +1,1042 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>news_application.views &mdash; Capstone Project 00.00.01 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d7bb8d4d"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Capstone Project
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">news_addiction</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Capstone Project</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">news_application.views</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for news_application.views</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">urllib</span><span class="w"> </span><span class="kn">import</span> <span class="n">request</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">get_object_or_404</span><span class="p">,</span> <span class="n">redirect</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">login</span><span class="p">,</span> <span class="n">logout</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span><span class="p">,</span> <span class="n">Group</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.forms</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">AuthenticationForm</span><span class="p">,</span> <span class="n">UserCreationForm</span><span class="p">,</span> 
+                                       <span class="n">PasswordResetForm</span><span class="p">,</span> <span class="n">SetPasswordForm</span>
+                                       <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.contenttypes.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContentType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.mail</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmailMessage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">messages</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Prefetch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">secrets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">user_passes_test</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Q</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hashlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">sha1</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">ArticleStatus</span><span class="p">,</span> <span class="n">Roles</span><span class="p">,</span> <span class="n">User</span><span class="p">,</span> <span class="n">ReaderProfile</span><span class="p">,</span> 
+                     <span class="n">JournalistProfile</span><span class="p">,</span> <span class="n">EditorProfile</span><span class="p">,</span>
+                     <span class="n">Publisher</span><span class="p">,</span> <span class="n">Article</span><span class="p">,</span> <span class="n">ResetToken</span><span class="p">,</span> <span class="n">ArticleSerializer</span>
+                     <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.forms</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">CustomUserCreationForm</span><span class="p">,</span> <span class="n">CustomPasswordResetForm</span><span class="p">,</span> 
+                    <span class="n">ArticleForm</span><span class="p">,</span> <span class="n">ArticlePublishForm</span><span class="p">,</span> <span class="n">EditorArticleForm</span><span class="p">,</span> 
+                    <span class="n">AssignJournalistsToPublisherForm</span>
+                    <span class="p">)</span>
+ 
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JsonResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">api_view</span><span class="p">,</span> <span class="n">renderer_classes</span><span class="p">,</span>
+                                       <span class="n">authentication_classes</span><span class="p">,</span>
+                                       <span class="n">permission_classes</span>
+                                       <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework_xml.renderers</span><span class="w"> </span><span class="kn">import</span> <span class="n">XMLRenderer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.response</span><span class="w"> </span><span class="kn">import</span> <span class="n">Response</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">status</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.authentication</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasicAuthentication</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">IsAuthenticated</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.functions.tweet</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tweet</span>
+
+<span class="c1"># Create your views here.</span>
+
+<div class="viewcode-block" id="in_group_editor">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.in_group_editor">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">in_group_editor</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns True if the user is in &quot;Editors&quot; group.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user (User): The user to check.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if the user is in the &quot;Editors&quot; group, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">user</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Editors&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="in_group_reader">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.in_group_reader">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">in_group_reader</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns True if the user is in &quot;Readers&quot; group.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user (User): The user to check.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if the user is in the &quot;Readers&quot; group, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">user</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Readers&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="in_group_journalist">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.in_group_journalist">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">in_group_journalist</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns True if the user is in &quot;Journalists&quot; group.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user (User): The user to check.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if the user is in the &quot;Journalists&quot; group, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">user</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Journalists&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="login_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.login_view">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">login_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Login view using Django&quot;s AuthenticationForm.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+  
+        
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">AuthenticationForm</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">get_user</span><span class="p">()</span>
+            <span class="n">login</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s2">&quot;user_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">id</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">set_expiry</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Session expires on browser close</span>
+    
+    
+            <span class="n">user_groups</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="c1"># Redirect to the appropriate dashboard based on user group:</span>
+            <span class="k">if</span> <span class="n">user_groups</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Readers&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;reader_start_page&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">user_groups</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Editors&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;editor_start_page&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">user_groups</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Journalists&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;journalist_start_page&quot;</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">AuthenticationForm</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;news_application/login.html&quot;</span><span class="p">,</span> 
+                  <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;page_title&quot;</span><span class="p">:</span> <span class="s2">&quot;Login&quot;</span><span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="register_new_user_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.register_new_user_view">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">register_new_user_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple registration view using Django&quot;s built-in UserCreationForm.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CustomUserCreationForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="c1"># log the user in immediately after registration</span>
+            <span class="n">login</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span>
+
+            
+            <span class="c1"># Add the user to the group selected during registratio</span>
+
+            <span class="n">user_groups</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">user_groups</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Readers&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;reader_start_page&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">user_groups</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Editors&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;editor_start_page&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">user_groups</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Journalists&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;journalist_start_page&quot;</span><span class="p">)</span>
+        
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CustomUserCreationForm</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;news_application/register_new_user.html&quot;</span><span class="p">,</span>
+                  <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;page_title&quot;</span><span class="p">:</span> <span class="s2">&quot;Register&quot;</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="logout_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.logout_view">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">logout_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple logout view that logs out the user and redirects to login page.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logout</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;login_page&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="request_reset_password_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.request_reset_password_view">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">request_reset_password_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple view to handle password reset requests.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CustomPasswordResetForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="c1"># Generate reset URL, send email - if the user exists and </span>
+            <span class="c1"># email matches:</span>
+
+            <span class="n">username</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">]</span>
+            <span class="n">email</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username__iexact</span><span class="o">=</span><span class="n">username</span><span class="p">,</span>
+                                        <span class="n">email__iexact</span><span class="o">=</span><span class="n">email</span><span class="p">,</span>
+                                        <span class="n">is_active</span><span class="o">=</span><span class="kc">True</span>
+                                        <span class="p">)</span>
+                <span class="n">reset_url</span> <span class="o">=</span> <span class="n">generate_reset_url</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+                <span class="n">email</span> <span class="o">=</span> <span class="n">build_email_reset_password</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">reset_url</span><span class="p">)</span>
+                <span class="n">email</span><span class="o">.</span><span class="n">send</span><span class="p">()</span>
+
+                <span class="c1"># Show message that email has been sent at login page:</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                    <span class="n">request</span><span class="p">,</span>
+                    <span class="s2">&quot;Password reset email sent! Please check your inbox.&quot;</span>
+                <span class="p">)</span>
+                <span class="c1"># Redirect to login page:</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;login_page&quot;</span><span class="p">)</span>
+            
+            <span class="k">except</span> <span class="n">User</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+                <span class="c1"># Show error if user details are invalid:</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="n">request</span><span class="p">,</span> <span class="p">(</span>
+                        <span class="s2">&quot;No active user found with the &quot;</span>
+                        <span class="s2">&quot;provided username and email!&quot;</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="c1"># Redirect to login page:</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;login_page&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CustomPasswordResetForm</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;news_application/request_reset_password.html&quot;</span><span class="p">,</span>
+                  <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span><span class="s2">&quot;page_title&quot;</span><span class="p">:</span> <span class="s2">&quot;Request Password Reset&quot;</span><span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="generate_reset_url">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.generate_reset_url">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_reset_url</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a password reset URL for the given user.</span>
+<span class="sd">    This function creates a unique token and constructs a URL that can be</span>
+<span class="sd">    sent to the user&quot;s email for password reset.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user (User): The user requesting the password reset.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The complete password reset URL.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">domain</span> <span class="o">=</span> <span class="s2">&quot;http://127.0.0.1:8000/&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s2">reset_password/&quot;</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">secrets</span><span class="o">.</span><span class="n">token_urlsafe</span><span class="p">(</span><span class="mi">16</span><span class="p">))</span>
+    <span class="n">expiry_date</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">reset_token</span> <span class="o">=</span> <span class="n">ResetToken</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span>
+        <span class="n">token</span><span class="o">=</span><span class="n">sha1</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">(),</span>
+        <span class="n">expiry_date</span><span class="o">=</span><span class="n">expiry_date</span>
+    <span class="p">)</span>
+    <span class="n">url</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">url</span></div>
+
+
+
+<div class="viewcode-block" id="build_email_reset_password">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.build_email_reset_password">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_email_reset_password</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">reset_url</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Builds a password reset email.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user (User): The user requesting the password reset.</span>
+<span class="sd">        reset_url (str): The URL to reset the password.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        EmailMessage: The constructed email message.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="s2">&quot;Password Reset Requested&quot;</span>
+    <span class="n">user_email</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span>
+    <span class="n">domain_email</span> <span class="o">=</span> <span class="s2">&quot;example@domain.com&quot;</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Hi </span><span class="si">{</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">,</span><span class="se">\n</span><span class="s2">Here is your link to reset your &quot;</span>
+    <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;password: </span><span class="si">{</span><span class="n">reset_url</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">EmailMessage</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">domain_email</span><span class="p">,</span> <span class="p">[</span><span class="n">user_email</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">email</span></div>
+
+
+
+<div class="viewcode-block" id="reset_user_password_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.reset_user_password_view">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">reset_user_password_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to handle password reset using a token.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Validate the token</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">hashed_token</span> <span class="o">=</span> <span class="n">sha1</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+        <span class="n">user_token</span> <span class="o">=</span> <span class="n">ResetToken</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="n">hashed_token</span><span class="p">)</span>
+        
+        <span class="c1"># Check if token has expired</span>
+        <span class="k">if</span> <span class="n">user_token</span><span class="o">.</span><span class="n">expiry_date</span> <span class="o">&lt;</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">():</span>
+            <span class="n">user_token</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span>
+                <span class="s2">&quot;This password reset link has expired. &quot;</span>
+                <span class="s2">&quot;Please request a new one.&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;request_reset_password_page&quot;</span><span class="p">)</span>
+            
+    <span class="k">except</span> <span class="n">ResetToken</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="s2">&quot;Invalid password reset link. &quot;</span>
+            <span class="s2">&quot;Please request a new one.&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;request_reset_password_page&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Get the user associated with this token</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">user_token</span><span class="o">.</span><span class="n">user</span>
+    
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">SetPasswordForm</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="c1"># Save the new password</span>
+            <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            
+            <span class="c1"># Delete the used token to prevent reuse</span>
+            <span class="n">user_token</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+            
+            <span class="c1"># Show success message and redirect to login</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span>
+                <span class="s2">&quot;Your password has been reset successfully. &quot;</span>
+                <span class="s2">&quot;You can now log in with your new password.&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;login_page&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">SetPasswordForm</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;news_application/reset_password.html&quot;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
+        <span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span>
+        <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="n">user</span>
+    <span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="reader_start_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.reader_start_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_reader</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">reader_start_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to display reader start page - allowing Readers to browse articles</span>
+<span class="sd">    and newsletters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get search query from GET parameters</span>
+    <span class="n">search_query</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;search&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="c1"># Start with all articles</span>
+    <span class="n">articles</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    
+    <span class="c1"># Filter by search query if provided</span>
+    <span class="k">if</span> <span class="n">search_query</span><span class="p">:</span>
+        <span class="n">articles</span> <span class="o">=</span> <span class="n">articles</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">title__icontains</span><span class="o">=</span><span class="n">search_query</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;news_application/reader_start.html&quot;</span><span class="p">,</span>
+                  <span class="p">{</span><span class="s2">&quot;page_title&quot;</span><span class="p">:</span> <span class="s2">&quot;Welcome!&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;articles&quot;</span><span class="p">:</span> <span class="n">articles</span><span class="p">,</span>
+                   <span class="s2">&quot;search_query&quot;</span><span class="p">:</span> <span class="n">search_query</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="reader_view_article">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.reader_view_article">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_reader</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">reader_view_article</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to display a single article to the reader.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Article</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">article_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;news_application/reader_view_article.html&quot;</span><span class="p">,</span>
+                  <span class="p">{</span><span class="s2">&quot;page_title&quot;</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+                   <span class="s2">&quot;article&quot;</span><span class="p">:</span> <span class="n">article</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="reader_view_journalist_details">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.reader_view_journalist_details">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_reader</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">reader_view_journalist_details</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">journalist_id</span><span class="p">,</span> <span class="n">article_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to display details of a specific journalist to the reader.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">journalist</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">journalist_id</span><span class="p">,</span>
+                                   <span class="n">role</span><span class="o">=</span><span class="n">Roles</span><span class="o">.</span><span class="n">JOURNALIST</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">journalist</span><span class="o">.</span><span class="n">journalist_profile</span><span class="o">.</span><span class="n">subscribers</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="nb">id</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">reader_subscribed</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">reader_subscribed</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> 
+                  <span class="s2">&quot;news_application/reader_view_journalist_details.html&quot;</span><span class="p">,</span>
+                  <span class="p">{</span><span class="s2">&quot;page_title&quot;</span><span class="p">:</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Journalist Profile - &quot;</span><span class="p">,</span>
+                                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">journalist</span><span class="o">.</span><span class="n">display_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span>
+                   <span class="s2">&quot;reader_subscribed&quot;</span><span class="p">:</span> <span class="n">reader_subscribed</span><span class="p">,</span>
+                   <span class="s2">&quot;journalist&quot;</span><span class="p">:</span> <span class="n">journalist</span><span class="p">,</span>
+                   <span class="s2">&quot;previous_article_id&quot;</span><span class="p">:</span> <span class="n">article_id</span><span class="p">}</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="reader_view_publisher_details">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.reader_view_publisher_details">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_reader</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">reader_view_publisher_details</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to display details of a specific publisher to the reader.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Article</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">article_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">article</span><span class="o">.</span><span class="n">self_published</span><span class="p">:</span>
+        <span class="c1"># Return to journalist details if self-published:</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;reader_view_journalist_details_page&quot;</span><span class="p">,</span>
+                        <span class="n">journalist_id</span><span class="o">=</span><span class="n">article</span><span class="o">.</span><span class="n">author</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                        <span class="n">article_id</span><span class="o">=</span><span class="n">article</span><span class="o">.</span><span class="n">id</span>
+                        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Return to publisher details if not self-published:</span>
+        <span class="n">publisher</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Publisher</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">article</span><span class="o">.</span><span class="n">publisher</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="n">publisher_content_type</span> <span class="o">=</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_for_model</span><span class="p">(</span><span class="n">Publisher</span><span class="p">)</span>
+        <span class="n">articles_published</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">publisher_content_type</span><span class="o">=</span><span class="n">publisher_content_type</span><span class="p">,</span>
+            <span class="n">publisher_object_id</span><span class="o">=</span><span class="n">article</span><span class="o">.</span><span class="n">publisher</span><span class="o">.</span><span class="n">id</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">publisher</span><span class="o">.</span><span class="n">subscribers</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="nb">id</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">reader_subscribed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">reader_subscribed</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span>
+                    <span class="s2">&quot;news_application/reader_view_publisher_details.html&quot;</span><span class="p">,</span>
+                    <span class="p">{</span><span class="s2">&quot;page_title&quot;</span><span class="p">:</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Publisher Profile - &quot;</span><span class="p">,</span>
+                                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">publisher</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;reader_subscribed&quot;</span><span class="p">:</span> <span class="n">reader_subscribed</span><span class="p">,</span>
+                    <span class="s2">&quot;publisher&quot;</span><span class="p">:</span> <span class="n">publisher</span><span class="p">,</span>
+                    <span class="s2">&quot;articles_published&quot;</span><span class="p">:</span> <span class="n">articles_published</span><span class="p">,</span>
+                    <span class="s2">&quot;article&quot;</span><span class="p">:</span> <span class="n">article</span>
+                    <span class="p">}</span>
+                    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="reader_journalist_subscribe_unsubscribe">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.reader_journalist_subscribe_unsubscribe">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_reader</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">reader_journalist_subscribe_unsubscribe</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">journalist_id</span><span class="p">,</span>
+                                            <span class="n">article_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to allow a reader to subscribe or unsubscribe from a journalist.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">journalist</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">journalist_id</span><span class="p">,</span>
+                                   <span class="n">role</span><span class="o">=</span><span class="n">Roles</span><span class="o">.</span><span class="n">JOURNALIST</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">journalist</span><span class="o">.</span><span class="n">journalist_profile</span><span class="o">.</span><span class="n">subscribers</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="nb">id</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="c1"># Unsubscribe the reader</span>
+        <span class="n">journalist</span><span class="o">.</span><span class="n">journalist_profile</span><span class="o">.</span><span class="n">subscribers</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> 
+                         <span class="sa">f</span><span class="s2">&quot;You have unsubscribed from &quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">journalist</span><span class="o">.</span><span class="n">display_name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Subscribe the reader</span>
+        <span class="n">journalist</span><span class="o">.</span><span class="n">journalist_profile</span><span class="o">.</span><span class="n">subscribers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> 
+                         <span class="sa">f</span><span class="s2">&quot;You have subscribed to </span><span class="si">{</span><span class="n">journalist</span><span class="o">.</span><span class="n">display_name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;reader_view_journalist_details_page&quot;</span><span class="p">,</span> 
+                    <span class="n">journalist_id</span><span class="o">=</span><span class="n">journalist</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">article_id</span><span class="o">=</span><span class="n">article_id</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="reader_publisher_subscribe_unsubscribe">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.reader_publisher_subscribe_unsubscribe">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_reader</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">reader_publisher_subscribe_unsubscribe</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">publisher_id</span><span class="p">,</span> <span class="n">article_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to allow a reader to subscribe or unsubscribe from a publisher.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">publisher</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Publisher</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">publisher_id</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">publisher</span><span class="o">.</span><span class="n">subscribers</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="nb">id</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="c1"># Unsubscribe the reader</span>
+        <span class="n">publisher</span><span class="o">.</span><span class="n">subscribers</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> 
+                         <span class="sa">f</span><span class="s2">&quot;You have unsubscribed from &quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">publisher</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Subscribe the reader</span>
+        <span class="n">publisher</span><span class="o">.</span><span class="n">subscribers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> 
+                         <span class="sa">f</span><span class="s2">&quot;You have subscribed to </span><span class="si">{</span><span class="n">publisher</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;reader_view_publisher_details_page&quot;</span><span class="p">,</span> 
+                    <span class="n">article_id</span><span class="o">=</span><span class="n">article_id</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="journalist_start_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.journalist_start_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_journalist</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">journalist_start_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to display journalist start page - allowing Journalists to manage their articles</span>
+<span class="sd">    and newsletters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;news_application/journalist_start.html&quot;</span><span class="p">,</span>
+                  <span class="p">{</span><span class="s2">&quot;page_title&quot;</span><span class="p">:</span> <span class="s2">&quot;Journalist Dashboard&quot;</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="editor_start_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.editor_start_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_editor</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">editor_start_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to display editor start page - allowing Editors to manage their articles</span>
+<span class="sd">    and newsletters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">assigned_publishers</span> <span class="o">=</span> <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">editors</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;news_application/editor_start.html&quot;</span><span class="p">,</span>
+                  <span class="p">{</span><span class="s2">&quot;page_title&quot;</span><span class="p">:</span> <span class="s2">&quot;Editor Dashboard&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;assigned_publishers&quot;</span><span class="p">:</span> <span class="n">assigned_publishers</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="journalist_article_management_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.journalist_article_management_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_journalist</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">journalist_article_management_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to display journalist article management page - allowing Journalists to</span>
+<span class="sd">    manage their articles.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">articles</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span> 
+        <span class="s2">&quot;news_application/journalist_article_management.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;page_title&quot;</span><span class="p">:</span> <span class="s2">&quot;Article Management&quot;</span><span class="p">,</span> <span class="s2">&quot;articles&quot;</span><span class="p">:</span> <span class="n">articles</span><span class="p">,</span>
+         <span class="s2">&quot;ArticleStatus&quot;</span><span class="p">:</span> <span class="n">ArticleStatus</span><span class="p">}</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="journalist_article_add_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.journalist_article_add_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_journalist</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">journalist_article_add_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to create a new article.</span>
+<span class="sd">    :param request: HTTP request object.</span>
+<span class="sd">    :return: Rendered template for creating a new article.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">ArticleForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">article</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;journalist_article_management_page&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">ArticleForm</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;news_application/journalist_article_form.html&quot;</span><span class="p">,</span> 
+                  <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="journalist_article_edit_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.journalist_article_edit_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_journalist</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">journalist_article_edit_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to update an existing article.</span>
+
+<span class="sd">    :param request: HTTP request object.</span>
+<span class="sd">    :param pk: Primary key of the article to be updated.</span>
+<span class="sd">    :return: Rendered template for updating the specified article.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Article</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">ArticleForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">article</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">article</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;journalist_article_detail_page&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">article</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">ArticleForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">article</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;news_application/journalist_article_form.html&quot;</span><span class="p">,</span> 
+                  <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;article&quot;</span><span class="p">:</span> <span class="n">article</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="journalist_article_detail_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.journalist_article_detail_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_journalist</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">journalist_article_detail_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to display the details of a specific article.</span>
+
+<span class="sd">    :param request: HTTP request object.</span>
+<span class="sd">    :param pk: Primary key of the product to be displayed.</span>
+<span class="sd">    :return: Rendered template showing the details of the specified product.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Article</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;news_application/journalist_article_detail.html&quot;</span><span class="p">,</span> 
+                  <span class="p">{</span><span class="s2">&quot;article&quot;</span><span class="p">:</span> <span class="n">article</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="journalist_article_delete_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.journalist_article_delete_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_journalist</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">journalist_article_delete_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to delete an existing article.</span>
+
+<span class="sd">    :param request: HTTP request object.</span>
+<span class="sd">    :param pk: Primary key of the article to be deleted.</span>
+<span class="sd">    :return: Redirects to the article management page after publishing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Article</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">article</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;journalist_article_management_page&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> 
+                  <span class="s2">&quot;news_application/journalist_article_confirm_delete.html&quot;</span><span class="p">,</span> 
+                  <span class="p">{</span><span class="s2">&quot;article&quot;</span><span class="p">:</span> <span class="n">article</span><span class="p">}</span>
+                  <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="journalist_article_publish_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.journalist_article_publish_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_journalist</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">journalist_article_publish_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to publish an existing article.</span>
+
+<span class="sd">    :param request: HTTP request object.</span>
+<span class="sd">    :param pk: Primary key of the article to be published.</span>
+<span class="sd">    :return: Rendered template for publishing the specified article.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Article</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">ArticlePublishForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="p">,</span> 
+                                  <span class="n">instance</span><span class="o">=</span><span class="n">article</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">article</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;journalist_article_management_page&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">ArticlePublishForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">article</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span>
+                  <span class="s2">&quot;news_application/journalist_article_publish_form.html&quot;</span><span class="p">,</span> 
+                  <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;article&quot;</span><span class="p">:</span> <span class="n">article</span><span class="p">}</span>
+                  <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="editor_publisher_dashboard_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.editor_publisher_dashboard_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_editor</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">editor_publisher_dashboard_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to display editor publisher dashboard page - allowing Editors to </span>
+<span class="sd">    manage their assigned publisher.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">publisher</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Publisher</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span> <span class="n">editors</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;news_application/editor_publisher_dashboard.html&quot;</span><span class="p">,</span>
+                  <span class="p">{</span><span class="s2">&quot;page_title&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Editor Dashboard - </span><span class="si">{</span><span class="n">publisher</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;publisher&quot;</span><span class="p">:</span> <span class="n">publisher</span><span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="editor_journalist_management_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.editor_journalist_management_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_editor</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">editor_journalist_management_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to display editor journalist management page - allowing Editors to </span>
+<span class="sd">    manage journalists assigned to their publisher.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">publisher</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Publisher</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span> <span class="n">editors</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="n">journalists</span> <span class="o">=</span> <span class="n">publisher</span><span class="o">.</span><span class="n">journalists</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;news_application/editor_journalist_management.html&quot;</span><span class="p">,</span>
+                  <span class="p">{</span><span class="s2">&quot;page_title&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Journalist Management - </span><span class="si">{</span><span class="n">publisher</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;publisher&quot;</span><span class="p">:</span> <span class="n">publisher</span><span class="p">,</span>
+                   <span class="s2">&quot;journalists&quot;</span><span class="p">:</span> <span class="n">journalists</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="editor_assign_journalist_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.editor_assign_journalist_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_editor</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">editor_assign_journalist_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to assign a journalist to a publisher.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">publisher</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Publisher</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span> <span class="n">editors</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">AssignJournalistsToPublisherForm</span><span class="p">(</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> 
+            <span class="n">instance</span><span class="o">=</span><span class="n">publisher</span><span class="p">,</span>
+            <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">publisher</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">publisher</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;editor_journalist_management_page&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">publisher</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">AssignJournalistsToPublisherForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">publisher</span><span class="p">,</span> 
+                                                <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;news_application/editor_assign_journalist_form.html&quot;</span><span class="p">,</span> 
+                  <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;publisher&quot;</span><span class="p">:</span> <span class="n">publisher</span><span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="editor_journalist_remove_assignment_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.editor_journalist_remove_assignment_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_editor</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">editor_journalist_remove_assignment_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">publisher_pk</span><span class="p">,</span> 
+                                             <span class="n">journalist_pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to remove a specific journalist from a publisher with confirmation.</span>
+
+<span class="sd">    :param request: HTTP request object.</span>
+<span class="sd">    :param publisher_pk: Primary key of the publisher.</span>
+<span class="sd">    :param journalist_pk: Primary key of the journalist to be removed.</span>
+<span class="sd">    :return: Rendered confirmation template (GET) or redirect after removal </span>
+<span class="sd">    (POST).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">publisher</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Publisher</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">publisher_pk</span><span class="p">,</span> 
+                                  <span class="n">editors</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="n">journalist</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">journalist_pk</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="c1"># User confirmed removal</span>
+        <span class="n">publisher</span><span class="o">.</span><span class="n">journalists</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">journalist</span><span class="p">)</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Journalist &#39;</span><span class="si">{</span><span class="n">journalist</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">&#39; &quot;</span> 
+                         <span class="sa">f</span><span class="s2">&quot; has been unassigned from the publisher.&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;editor_journalist_management_page&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">publisher</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+
+    <span class="c1"># Show confirmation page</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span> 
+        <span class="s2">&quot;news_application/editor_journalist_remove_assignment_confirm.html&quot;</span><span class="p">,</span> 
+        <span class="p">{</span><span class="s2">&quot;publisher&quot;</span><span class="p">:</span> <span class="n">publisher</span><span class="p">,</span> <span class="s2">&quot;journalist&quot;</span><span class="p">:</span> <span class="n">journalist</span><span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="editor_article_management_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.editor_article_management_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_editor</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">editor_article_management_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to display editor article management page - allowing Editors to</span>
+<span class="sd">    manage articles for their assigned publisher.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    
+    <span class="n">publisher</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Publisher</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span> <span class="n">editors</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="n">publisher_content_type</span> <span class="o">=</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_for_model</span><span class="p">(</span><span class="n">Publisher</span><span class="p">)</span>
+    <span class="n">articles</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">publisher_content_type</span><span class="o">=</span><span class="n">publisher_content_type</span><span class="p">,</span>
+        <span class="n">publisher_object_id</span><span class="o">=</span><span class="n">publisher</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s2">&quot;author&quot;</span>
+        <span class="p">)</span>
+      
+    
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;news_application/editor_article_management.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;page_title&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Article Management - </span><span class="si">{</span><span class="n">publisher</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> 
+            <span class="s2">&quot;publisher&quot;</span><span class="p">:</span> <span class="n">publisher</span><span class="p">,</span>
+            <span class="s2">&quot;articles&quot;</span><span class="p">:</span> <span class="n">articles</span><span class="p">,</span>
+            <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+            <span class="s2">&quot;ArticleStatus&quot;</span><span class="p">:</span> <span class="n">ArticleStatus</span>
+        <span class="p">}</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="editor_article_detail_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.editor_article_detail_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_editor</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">editor_article_detail_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to display the details of a specific article.</span>
+
+<span class="sd">    :param request: HTTP request object.</span>
+<span class="sd">    :param pk: Primary key of the product to be displayed.</span>
+<span class="sd">    :return: Rendered template showing the details of the specified product.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Article</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;news_application/editor_article_detail.html&quot;</span><span class="p">,</span> 
+                  <span class="p">{</span><span class="s2">&quot;article&quot;</span><span class="p">:</span> <span class="n">article</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="editor_article_edit_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.editor_article_edit_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_editor</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">editor_article_edit_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to update an existing article.</span>
+
+<span class="sd">    :param request: HTTP request object.</span>
+<span class="sd">    :param pk: Primary key of the article to be updated.</span>
+<span class="sd">    :return: Rendered template for updating the specified article.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Article</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">EditorArticleForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">article</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">article</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;editor_article_detail_page&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">article</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">EditorArticleForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">article</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;news_application/editor_article_form.html&quot;</span><span class="p">,</span> 
+                  <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;article&quot;</span><span class="p">:</span> <span class="n">article</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="editor_article_delete_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.editor_article_delete_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_editor</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">editor_article_delete_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to delete an existing article.</span>
+
+<span class="sd">    :param request: HTTP request object.</span>
+<span class="sd">    :param pk: Primary key of the article to be deleted.</span>
+<span class="sd">    :return: Redirects to the article management page after publishing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Article</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">article</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;editor_article_management_page&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> 
+                  <span class="s2">&quot;news_application/editor_article_confirm_delete.html&quot;</span><span class="p">,</span> 
+                  <span class="p">{</span><span class="s2">&quot;article&quot;</span><span class="p">:</span> <span class="n">article</span><span class="p">}</span>
+                  <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="editor_reject_for_publication_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.editor_reject_for_publication_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_editor</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">editor_reject_for_publication_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to reject an existing article for publication.</span>
+<span class="sd">    Directly rejects the article and redirects without intermediate page.</span>
+
+<span class="sd">    :param request: HTTP request object.</span>
+<span class="sd">    :param pk: Primary key of the article to be rejected.</span>
+<span class="sd">    :return: Redirects to the article management page after rejecting.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Article</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+    <span class="n">article</span><span class="o">.</span><span class="n">publication_status</span> <span class="o">=</span> <span class="n">ArticleStatus</span><span class="o">.</span><span class="n">REJECTED</span>
+    <span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Article &#39;</span><span class="si">{</span><span class="n">article</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot;has been rejected for publication.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot;The author will be notified via email.&quot;</span>
+                     <span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;editor_article_management_page&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">article</span><span class="o">.</span><span class="n">publisher</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="editor_accept_for_publication_view">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.editor_accept_for_publication_view">[docs]</a>
+<span class="nd">@user_passes_test</span><span class="p">(</span><span class="n">in_group_editor</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">editor_accept_for_publication_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View to reject an existing article for publication.</span>
+<span class="sd">    Directly rejects the article and redirects without intermediate page.</span>
+
+<span class="sd">    :param request: HTTP request object.</span>
+<span class="sd">    :param pk: Primary key of the article to be rejected.</span>
+<span class="sd">    :return: Redirects to the article management page after rejecting.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Article</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+    <span class="n">article</span><span class="o">.</span><span class="n">publication_status</span> <span class="o">=</span> <span class="n">ArticleStatus</span><span class="o">.</span><span class="n">PUBLISHED</span>
+    <span class="n">article</span><span class="o">.</span><span class="n">publication_date</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Article &#39;</span><span class="si">{</span><span class="n">article</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot;has been accepted for publication.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot;All subscribers will be notified via email.&quot;</span>
+                     <span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;editor_article_management_page&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">article</span><span class="o">.</span><span class="n">publisher</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span></div>
+
+
+
+
+
+
+
+
+
+<div class="viewcode-block" id="publisher_name_q">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.publisher_name_q">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">publisher_name_q</span><span class="p">(</span><span class="n">publisher_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build a Q() that matches Article.publisher (GenericForeignKey) to either:</span>
+<span class="sd">      - Publisher objects whose .name matches publisher_name, OR</span>
+<span class="sd">      - User objects (self-published) whose username matches publisher_name</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Figure out content types for both possible targets</span>
+    <span class="n">ct_publisher</span> <span class="o">=</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_for_model</span><span class="p">(</span><span class="n">Publisher</span><span class="p">)</span>
+    <span class="n">ct_user</span> <span class="o">=</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_for_model</span><span class="p">(</span><span class="n">User</span><span class="p">)</span>
+
+    <span class="c1"># IDs that match the provided name on each concrete model</span>
+    <span class="n">publisher_ids</span> <span class="o">=</span> <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">name__iexact</span><span class="o">=</span><span class="n">publisher_name</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">user_ids</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">Q</span><span class="p">(</span><span class="n">username__iexact</span><span class="o">=</span><span class="n">publisher_name</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Build the OR across the two content types</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">Q</span><span class="p">(</span><span class="n">publisher_content_type</span><span class="o">=</span><span class="n">ct_publisher</span><span class="p">,</span>
+          <span class="n">publisher_object_id__in</span><span class="o">=</span><span class="n">publisher_ids</span><span class="p">)</span>
+        <span class="o">|</span>
+        <span class="n">Q</span><span class="p">(</span><span class="n">publisher_content_type</span><span class="o">=</span><span class="n">ct_user</span><span class="p">,</span>
+          <span class="n">publisher_object_id__in</span><span class="o">=</span><span class="n">user_ids</span><span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+
+<div class="viewcode-block" id="API_get_articles">
+<a class="viewcode-back" href="../../news_application.html#news_application.views.API_get_articles">[docs]</a>
+<span class="nd">@api_view</span><span class="p">([</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="nd">@authentication_classes</span><span class="p">([</span><span class="n">BasicAuthentication</span><span class="p">])</span>
+<span class="nd">@permission_classes</span><span class="p">([</span><span class="n">IsAuthenticated</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">API_get_articles</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;API Request to View all articles, or if the request contains the keyword</span>
+<span class="sd">    &#39;author_name&#39; then filter by that author, if request contains the keyword</span>
+<span class="sd">    &#39;publisher_name&#39; then filter by that publisher.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request (HttpRequest): The HTTP request object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
+        <span class="n">author_name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;author_name&#39;</span><span class="p">)</span>
+        <span class="n">publisher_name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;publisher_name&#39;</span><span class="p">)</span>
+
+        <span class="n">query_articles</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s2">&quot;author&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">author_name</span><span class="p">:</span>
+            <span class="n">query_articles</span> <span class="o">=</span> <span class="n">query_articles</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">author__username__iexact</span><span class="o">=</span><span class="n">author_name</span><span class="p">)</span>
+        
+        
+        <span class="c1"># Generic ForeignKey filtering (publisher can be Publisher or User):</span>
+        <span class="k">if</span> <span class="n">publisher_name</span><span class="p">:</span>
+            <span class="n">query_articles</span> <span class="o">=</span> <span class="n">query_articles</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">publisher_name_q</span><span class="p">(</span><span class="n">publisher_name</span><span class="p">))</span>
+
+        <span class="n">serializer</span> <span class="o">=</span> <span class="n">ArticleSerializer</span><span class="p">(</span><span class="n">query_articles</span><span class="p">,</span> <span class="n">many</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">serializer</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Jacques Blignaut.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
